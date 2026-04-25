@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Card.Club Partner Journey</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0B0E14;
+            color: #E8EDF5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 12px;
+        }
+        /* ===== MAIN APP CONTAINER ===== */
+        #app {
+            width: 100%;
+            max-width: 480px;
+            height: 780px;
+            max-height: 92vh;
+            background: linear-gradient(145deg, #11161f 0%, #0a0d13 100%);
+            border-radius: 36px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(2px);
+        }
+        /* ===== SCREENS ===== */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 28px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform: translateY(18px) scale(0.97);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2a3140 transparent;
+        }
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0) scale(1);
+            z-index: 10;
+        }
+        .screen::-webkit-scrollbar { width: 3px; }
+        .screen::-webkit-scrollbar-thumb { background: #2a3140; border-radius: 12px; }
+        /* ===== GLASS MORPH ===== */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 20px 18px;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+        /* ===== TYPOGRAPHY ===== */
+        .gold-text {
+            background: linear-gradient(135deg, #F5D77B, #C9A84C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-accent {
+            background: linear-gradient(135deg, #9b6eff, #6a4cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-value {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            opacity: 0.5;
+            font-weight: 400;
+        }
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 28px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            width: 100%;
+            background: linear-gradient(135deg, #2a3140, #1a1f2a);
+            color: #E8EDF5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #C9A84C, #F5D77B);
+            color: #0B0E14;
+            font-weight: 700;
+            box-shadow: 0 0 30px rgba(201, 168, 76, 0.15);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 30px rgba(201, 168, 76, 0.25);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            border-color: #C9A84C;
+            background: rgba(201, 168, 76, 0.08);
+        }
+        .btn-small {
+            padding: 12px 18px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        /* ===== SLIDER ===== */
+        .slider-wrap {
+            margin: 12px 0 6px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #2a3140;
+            border-radius: 4px;
+            outline: none;
+            transition: background 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #F5D77B, #C9A84C);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(201, 168, 76, 0.25);
+            transition: 0.15s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar {
+            height: 4px;
+            background: #1a1f2a;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 20px 0 10px;
+            width: 100%;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #C9A84C, #F5D77B);
+            border-radius: 6px;
+            transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        /* ===== RANK BADGE ===== */
+        .rank-badge {
+            display: inline-block;
+            background: rgba(201, 168, 76, 0.12);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: #F5D77B;
+        }
+        /* ===== ANALOGY ITEMS ===== */
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .analogy-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 14px 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+            text-align: center;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .analogy-item:hover {
+            background: rgba(201,168,76,0.06);
+            border-color: rgba(201,168,76,0.15);
+        }
+        .analogy-icon {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+        .analogy-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            line-height: 1.3;
+        }
+        /* ===== LIVE FEED ===== */
+        .live-feed {
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.03);
+            max-height: 90px;
+            overflow-y: auto;
+        }
+        .feed-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .feed-dot {
+            width: 6px; height: 6px;
+            background: #C9A84C;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+        /* ===== MISC ===== */
+        .flex-grow { flex: 1; }
+        .mt-auto { margin-top: auto; }
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 16px; }
+        .op-6 { opacity: 0.6; }
+        .gap-2 { gap: 8px; }
+        .flex-col { display: flex; flex-direction: column; }
+        .inline-flex { display: inline-flex; align-items: center; gap: 6px; }
+        .copy-area {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            border: 1px solid rgba(255,215,0,0.1);
+            margin: 10px 0;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: rgba(201,168,76,0.15);
+            border: none;
+            color: #F5D77B;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            cursor: pointer;
+        }
+        .badge-gold {
+            background: rgba(201,168,76,0.2);
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #F5D77B;
+        }
+        .reality-break {
+            background: rgba(255,70,70,0.08);
+            border: 1px solid rgba(255,70,70,0.15);
+            border-radius: 16px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+        .reality-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 500px) {
+            #app {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            .screen { padding: 20px 16px; }
+            .stat-value { font-size: 2rem; }
+        }
+        /* ===== ANIMATIONS ===== */
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .pulse-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: #50fa7b;
+            border-radius: 50%;
+            animation: pulse-dot 1.6s infinite;
+        }
+        /* hidden utility */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- ===== SCREEN 1: WELCOME ===== -->
+    <div class="screen active" data-screen="welcome">
+        <div class="flex-grow flex-col" style="justify-content: center;">
+            <div class="mb-3">
+                <span class="rank-badge">✨ partner program</span>
+            </div>
+            <h1 style="font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 12px;">
+                Превратите<br>
+                <span class="gold-text">базу клиентов</span><br>
+                в доход
+            </h1>
+            <p class="op-6" style="font-size: 0.95rem; max-width: 90%; margin-bottom: 20px;">
+                Card.Club — виртуальные международные карты. 
+                Вы помогаете клиентам, мы даём инструменты 
+                и делимся прибылью.
+            </p>
+            <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 14px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.04);">
+                <div class="inline-flex mb-2">
+                    <span class="pulse-dot" style="margin-right: 8px;"></span>
+                    <span style="font-size: 0.8rem; opacity: 0.7;">Уже 25 000+ карт выпущено</span>
+                </div>
+                <div style="display: flex; gap: 20px;">
+                    <div><span class="stat-value" style="font-size: 1.6rem;">$0</span> <span class="stat-label">старт</span></div>
+                    <div><span class="stat-value gold-text" style="font-size: 1.6rem;">$17.5k</span> <span class="stat-label">потенциал</span></div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="goToScreen('segment')">
+                Рассчитать мой сценарий →
+            </button>
+        </div>
+        <div class="text-center op-6" style="font-size: 0.7rem; margin-top: 12px;">
+            6 шагов • 3 минуты
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 2: SEGMENT + BASE ===== -->
+    <div class="screen" data-screen="segment">
+        <div class="flex-grow flex-col">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span class="rank-badge">👋 давайте знакомиться</span>
+                <span style="font-size: 0.7rem; opacity: 0.4;">шаг 2/6</span>
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 600; margin-bottom: 6px;">Расскажите о себе</h2>
+            <p class="op-6 mb-3" style="font-size: 0.9rem;">Цифры будут лично про вас. Эффект Барнума? Работает.</p>
+            
+            <label style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 6px;">Ваш сегмент</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <button class="btn btn-small btn-outline" data-segment="travel" onclick="selectSegment(this)">✈️ Туризм</button>
+                <button class="btn btn-small btn-outline" data-segment="visa" onclick="selectSegment(this)">🛂 Визы</button>
+                <button class="btn btn-small btn-outline" data-segment="realty" onclick="selectSegment(this)">🏡 Недвижимость</button>
+                <button class="btn btn-small btn-outline" data-segment="blogger" onclick="selectSegment(this)">📱 Блогер</button>
+            </div>
+
+            <label style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 6px;">Клиентов в базе: <strong id="baseDisplay" style="color:#F5D77B;">500</strong></label>
+            <div class="slider-wrap">
+                <input type="range" id="baseSlider" min="50" max="50000" value="500" step="10" oninput="updateBase(this.value)">
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; opacity: 0.4;">
+                <span>50</span>
+                <span>25 000</span>
+                <span>50 000</span>
+            </div>
+            <div class="flex-grow"></div>
+            <button class="btn btn-primary mt-auto" onclick="goToScreen('activate')" id="segmentNext">
+                Я в деле →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 3: ACTIVATE FIRST CARD ===== -->
+    <div class="screen" data-screen="activate">
+        <div class="flex-grow flex-col">
+            <div class="mb-3">
+                <span class="rank-badge">🎯 кабинет активирован</span>
+            </div>
+            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 6px;">Первая карта</h2>
+            <p class="op-6 mb-3">Испытайте сами или сразу клиенту?</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button class="btn btn-small btn-outline" onclick="issueCard('self')">💳 Себе (ИИ/сервисы)</button>
+                <button class="btn btn-small btn-outline" onclick="issueCard('self_biz')">💼 Себе (бизнес софт)</button>
+                <button class="btn btn-small btn-outline" onclick="issueCard('client')">🧑‍💼 Клиенту</button>
+            </div>
+            <div id="cardResult" class="glass-card hidden">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 2rem;">✅</span>
+                    <div>
+                        <div style="font-weight: 600;">Карта выпущена!</div>
+                        <div class="op-6" style="font-size: 0.8rem;">+100 XP · скидка 50% на комиссию</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-grow"></div>
+            <button class="btn btn-primary mt-auto" onclick="goToScreen('pricing')" id="activateNext" disabled>
+                Дальше →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 4: PRICING + COMPARE ===== -->
+    <div class="screen" data-screen="pricing">
+        <div class="flex-grow flex-col">
+            <div class="mb-3">
+                <span class="rank-badge">💎 цена и стратегия</span>
+            </div>
+            <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 4px;">Сколько будет стоить карта?</h2>
+            <p class="op-6 mb-2" style="font-size: 0.8rem;">Чем выше цена — тем больше ваш доход</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 0.75rem; opacity: 0.5;">$20</span>
+                <span class="stat-value gold-text" id="priceDisplay">$35</span>
+                <span style="font-size: 0.75rem; opacity: 0.5;">$200</span>
+            </div>
+            <div class="slider-wrap">
+                <input type="range" id="priceSlider" min="20" max="200" value="35" step="1" oninput="updatePrice(this.value)">
+            </div>
+            <div style="display: flex; gap: 8px; margin: 12px 0 16px;">
+                <span class="badge-gold" onclick="setPresetPrice(35)">Базовый $35</span>
+                <span class="badge-gold" onclick="setPresetPrice(99)">Премиум $99</span>
+                <span class="badge-gold" onclick="setPresetPrice(149)">Элитный $149</span>
+            </div>
+
+            <!-- Comparison block -->
+            <div class="glass-card" style="padding: 14px;">
+                <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 8px;">Сравнение</div>
+                <div style="display: flex; gap: 10px; font-size: 0.7rem;">
+                    <div style="flex:1; background: rgba(255,70,70,0.08); border-radius: 10px; padding: 8px;">
+                        <div style="font-weight: 600;">🇰🇿 КЗ / 🇰🇬 КГ</div>
+                        <div>$250–300</div>
+                        <div class="op-6">10–30 дней</div>
+                    </div>
+                    <div style="flex:1; background: rgba(80,250,123,0.08); border-radius: 10px; padding: 8px; border: 1px solid rgba(80,250,123,0.15);">
+                        <div style="font-weight: 600;">✅ Card.Club</div>
+                        <div class="gold-text" id="comparePrice">$35</div>
+                        <div class="op-6">2 минуты</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-grow"></div>
+            <button class="btn btn-primary mt-auto" onclick="goToScreen('actions')">
+                К стратегии →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 5: ACTIONS + GROWTH ===== -->
+    <div class="screen" data-screen="actions">
+        <div class="flex-grow flex-col">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="rank-badge" id="rankBadge">⭐ STARTER</span>
+                <span style="font-size: 0.7rem; opacity: 0.4;">шаг 5/6</span>
+            </div>
+            <h2 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 4px;">Ваш прогресс</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+
+            <!-- Stats -->
+            <div style="display: flex; gap: 20px; margin: 8px 0 12px;">
+                <div><span class="stat-value gold-text" id="revenueDisplay">$0</span> <span class="stat-label">доход</span></div>
+                <div><span class="stat-value" id="cardsDisplay" style="font-size: 1.4rem;">0</span> <span class="stat-label">карт</span></div>
+                <div><span class="stat-value" style="font-size: 1.4rem;" id="xpDisplay">0</span> <span class="stat-label">XP</span></div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                <button class="btn btn-small btn-outline" id="getMaterialsBtn" onclick="getMaterials()">📦 Забрать материалы</button>
+                <button class="btn btn-small btn-outline" id="doTouchBtn" disabled onclick="doTouch()">📣 Сделать касание</button>
+            </div>
+
+            <!-- Live feed -->
+            <div class="live-feed" id="liveFeed">
+                <div class="feed-item"><span class="feed-dot"></span><span>Ваш кабинет активирован</span></div>
+                <div class="feed-item"><span class="feed-dot"></span><span>Ждём ваших действий</span></div>
+            </div>
+
+            <!-- Analogy preview -->
+            <div id="analogyBlock" class="hidden" style="margin-top: 12px;">
+                <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Ваша награда:</div>
+                <div id="analogyContent" class="analogy-grid"></div>
+            </div>
+
+            <div class="flex-grow"></div>
+            <button class="btn btn-primary mt-auto" id="finishBtn" disabled onclick="goToScreen('final')">
+                Подвести итоги →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN 6: FINAL + PROMISE ===== -->
+    <div class="screen" data-screen="final">
+        <div class="flex-grow flex-col">
+            <div class="mb-3">
+                <span class="rank-badge">🏆 ваш результат</span>
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 4px;">
+                <span class="gold-text">KILLER-ФИНАЛ</span>
+            </h2>
+            <div style="display: flex; gap: 16px; margin: 8px 0;">
+                <div><div class="stat-value" style="font-size: 1.8rem;" id="final3m">$0</div><div class="stat-label">за 3 мес</div></div>
+                <div><div class="stat-value gold-text" style="font-size: 1.8rem;" id="final12m">$0</div><div class="stat-label">за 12 мес</div></div>
+            </div>
+
+            <!-- Reality break -->
+            <div class="reality-break">
+                <div class="inline-flex mb-2"><span style="color:#ff6b6b;">⚡ Reality Break</span></div>
+                <div style="font-size: 0.85rem; opacity: 0.8;">
+                    Вы могли бы получить <span class="reality-value" id="realityLost">$0</span> / год<br>
+                    <span class="op-6">если ничего не делать</span>
+                </div>
+            </div>
+
+            <!-- Analogy final -->
+            <div id="finalAnalogy" class="glass-card" style="padding: 14px; margin-bottom: 12px;">
+                <div style="font-size: 0.8rem; font-weight: 600;">🎁 Ваш уровень жизни:</div>
+                <div id="finalAnalogyText" style="font-size: 0.9rem; margin-top: 4px;">—</div>
+            </div>
+
+            <!-- Promise block -->
+            <div style="border-top: 1px solid rgba(255,215,0,0.1); padding-top: 12px; margin-top: 6px;">
+                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">✉️ Моё обещание себе</div>
+                <div class="copy-area" id="promiseText">
+                    Я, [Имя], обещаю начать монетизировать базу с Card.Club.
+                    Моя цель — $[сумма] в месяц. Дата: [дата].
+                    <button class="copy-btn" onclick="copyPromise()">📋</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="https://t.me/share/url?text=Я+начинаю+монетизировать+базу!+Card.Club+партнёр" target="_blank" class="btn btn-small btn-outline" style="flex:1;">📨 TG</a>
+                    <a href="mailto:partner@card.club?subject=Моё обещание&body=Хочу начать!" class="btn btn-small btn-outline" style="flex:1;">📧 Email</a>
+                </div>
+            </div>
+
+            <div class="flex-grow"></div>
+            <a href="https://t.me/Vladi_andr" target="_blank" class="btn btn-primary mt-auto">
+                ✍️ Написать Владимиру
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== STATE =====
+    const state = {
+        screen: 'welcome',
+        segment: 'travel',
+        base: 500,
+        cardPrice: 35,
+        firstCardIssued: false,
+        materialsCollected: false,
+        touchCount: 0,
+        xp: 0,
+        totalRevenue: 0,
+        totalCards: 0,
+        rankIndex: 0, // 0=Starter,1=Pro,2=Expert,3=Elite
+        conversionRate: 0.12, // base
+        baseConversion: 0.12,
+    };
+
+    const ranks = ['⭐ STARTER', '🔥 PRO', '💎 EXPERT', '👑 ELITE'];
+    const xpThresholds = [0, 200, 500, 1000];
+
+    // Analogies
+    const analogies = [
+        { icon: '💐', label: 'Цветы каждую неделю', minRevenue: 0 },
+        { icon: '🏋️', label: 'Личный тренер', minRevenue: 500 },
+        { icon: '✈️', label: 'Отпуск мечты (Бали)', minRevenue: 3000 },
+        { icon: '💼', label: 'VIP-зал + Бизнес класс', minRevenue: 8000 },
+        { icon: '🚗', label: 'Личный водитель + повар', minRevenue: 15000 },
+    ];
+
+    // ===== CORE FUNCTIONS =====
+    function calcRevenue() {
+        const conv = state.conversionRate;
+        state.totalCards = Math.round(state.base * conv * (1 + state.touchCount * 0.15));
+        if (state.materialsCollected) state.totalCards = Math.round(state.totalCards * 1.10);
+        state.totalRevenue = state.totalCards * (state.cardPrice * 0.50);
+        // cap for realism
+        if (state.totalRevenue > 500000) state.totalRevenue = 500000;
+        return state.totalRevenue;
+    }
+
+    function updateUI() {
+        // Revenue
+        calcRevenue();
+        const revEl = document.getElementById('revenueDisplay');
+        if (revEl) revEl.textContent = '$' + Math.round(state.totalRevenue).toLocaleString();
+        const cardsEl = document.getElementById('cardsDisplay');
+        if (cardsEl) cardsEl.textContent = state.totalCards;
+        const xpEl = document.getElementById('xpDisplay');
+        if (xpEl) xpEl.textContent = state.xp;
+
+        // Rank
+        let newRankIndex = 0;
+        for (let i = xpThresholds.length - 1; i >= 0; i--) {
+            if (state.xp >= xpThresholds[i]) { newRankIndex = i; break; }
+        }
+        state.rankIndex = newRankIndex;
+        const badge = document.getElementById('rankBadge');
+        if (badge) badge.textContent = ranks[state.rankIndex];
+
+        // Progress bar
+        const nextThreshold = xpThresholds[Math.min(state.rankIndex + 1, xpThresholds.length - 1)];
+        const currentThreshold = xpThresholds[state.rankIndex];
+        const progress = nextThreshold > currentThreshold ? 
+            ((state.xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100 : 100;
+        const fill = document.getElementById('progressFill');
+        if (fill) fill.style.width = Math.min(progress, 100) + '%';
+
+        // Final screens
+        const final3m = document.getElementById('final3m');
+        if (final3m) final3m.textContent = '$' + Math.round(state.totalRevenue).toLocaleString();
+        const final12m = document.getElementById('final12m');
+        if (final12m) final12m.textContent = '$' + Math.round(state.totalRevenue * 4).toLocaleString();
+
+        // Reality break
+        const realityLost = document.getElementById('realityLost');
+        if (realityLost) realityLost.textContent = '$' + Math.round(state.totalRevenue * 4 * 0.6).toLocaleString();
+
+        // Analogy
+        updateAnalogy();
+        updateFinalAnalogy();
+
+        // Touch button
+        const touchBtn = document.getElementById('doTouchBtn');
+        if (touchBtn) touchBtn.disabled = !state.materialsCollected || state.touchCount >= 3;
+        // Finish button
+        const finishBtn = document.getElementById('finishBtn');
+        if (finishBtn) finishBtn.disabled = state.touchCount < 1;
+        // Activate next
+        const activateNext = document.getElementById('activateNext');
+        if (activateNext) activateNext.disabled = !state.firstCardIssued;
+    }
+
+    function updateAnalogy() {
+        const block = document.getElementById('analogyBlock');
+        const cont = document.getElementById('analogyContent');
+        if (!cont) return;
+        const rev = state.totalRevenue / 3; // monthly approximation
+        let shown = analogies.filter(a => rev >= a.minRevenue).slice(0, 3);
+        if (shown.length === 0) { block?.classList.add('hidden'); return; }
+        block?.classList.remove('hidden');
+        cont.innerHTML = shown.map(a => `
+            <div class="analogy-item">
+                <div class="analogy-icon">${a.icon}</div>
+                <div class="analogy-label">${a.label}</div>
+            </div>
+        `).join('');
+    }
+
+    function updateFinalAnalogy() {
+        const el = document.getElementById('finalAnalogyText');
+        if (!el) return;
+        const rev = state.totalRevenue / 3;
+        let best = analogies.filter(a => rev >= a.minRevenue);
+        if (best.length === 0) { el.textContent = 'Начните получать доход'; return; }
+        const top = best[best.length - 1];
+        el.textContent = `${top.icon} ${top.label} ( ~ $${rev.toFixed(0)}/мес )`;
+    }
+
+    function addFeed(text) {
+        const feed = document.getElementById('liveFeed');
+        if (!feed) return;
+        const item = document.createElement('div');
+        item.className = 'feed-item';
+        item.innerHTML = `<span class="feed-dot"></span><span>${text}</span>`;
+        feed.prepend(item);
+        if (feed.children.length > 6) feed.removeChild(feed.lastChild);
+    }
+
+    // ===== SCREEN NAVIGATION =====
+    function goToScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const next = document.querySelector(`[data-screen="${id}"]`);
+        if (next) next.classList.add('active');
+        state.screen = id;
+        updateUI();
+        // Append feed on actions screen
+        if (id === 'actions') {
+            addFeed('Вы перешли к стратегии');
+        }
+        if (id === 'final') {
+            generatePromise();
+            addFeed('🎯 Финальный результат!');
+        }
+    }
+
+    // ===== SEGMENT =====
+    function selectSegment(btn) {
+        document.querySelectorAll('[data-segment]').forEach(b => b.style.borderColor = 'rgba(255,255,255,0.1)');
+        btn.style.borderColor = '#C9A84C';
+        state.segment = btn.dataset.segment;
+        // set base conversion by segment
+        const conversions = { travel: 0.12, visa: 0.15, realty: 0.08, blogger: 0.18 };
+        state.conversionRate = conversions[state.segment] || 0.12;
+        state.baseConversion = state.conversionRate;
+        updateUI();
+    }
+
+    function updateBase(val) {
+        state.base = parseInt(val);
+        document.getElementById('baseDisplay').textContent = parseInt(val).toLocaleString();
+        updateUI();
+    }
+
+    // ===== CARD ISSUE =====
+    function issueCard(type) {
+        if (state.firstCardIssued) return;
+        state.firstCardIssued = true;
+        state.xp += 100;
+        const res = document.getElementById('cardResult');
+        if (res) res.classList.remove('hidden');
+        const next = document.getElementById('activateNext');
+        if (next) next.disabled = false;
+        let label = type === 'self' ? 'себе (сервисы)' : type === 'self_biz' ? 'себе (бизнес)' : 'клиенту';
+        addFeed(`💳 Выпущена карта (${label}) +100 XP`);
+        updateUI();
+    }
+
+    // ===== PRICE =====
+    function updatePrice(val) {
+        state.cardPrice = parseInt(val);
+        document.getElementById('priceDisplay').textContent = '$' + val;
+        document.getElementById('comparePrice').textContent = '$' + val;
+        updateUI();
+    }
+    function setPresetPrice(val) {
+        state.cardPrice = val;
+        document.getElementById('priceSlider').value = val;
+        document.getElementById('priceDisplay').textContent = '$' + val;
+        document.getElementById('comparePrice').textContent = '$' + val;
+        updateUI();
+    }
+
+    // ===== ACTIONS =====
+    function getMaterials() {
+        if (state.materialsCollected) return;
+        state.materialsCollected = true;
+        state.xp += 50;
+        addFeed('📦 Забраны промо-материалы +50 XP');
+        document.getElementById('getMaterialsBtn').disabled = true;
+        document.getElementById('doTouchBtn').disabled = false;
+        updateUI();
+    }
+
+    function doTouch() {
+        if (state.touchCount >= 3) return;
+        state.touchCount++;
+        state.xp += 75;
+        // boost conversion slightly each touch
+        state.conversionRate = state.baseConversion * (1 + state.touchCount * 0.12);
+        addFeed(`📣 Сделано касание #${state.touchCount} +75 XP`);
+        
+        // if touchCount >= 3, unlock finish
+        if (state.touchCount >= 3) {
+            document.getElementById('finishBtn').disabled = false;
+            document.getElementById('doTouchBtn').disabled = true;
+        }
+        // After 2 touches, re-enable materials if not collected
+        if (state.touchCount === 2 && !state.materialsCollected) {
+            // do nothing
+        }
+        updateUI();
+
+        // Show analogy block after first touch
+        if (state.touchCount >= 1) {
+            document.getElementById('analogyBlock')?.classList.remove('hidden');
+        }
+    }
+
+    // ===== FINAL =====
+    function generatePromise() {
+        const el = document.getElementById('promiseText');
+        if (!el) return;
+        const date = new Date();
+        const dateStr = date.toLocaleDateString('ru-RU');
+        const monthly = Math.round(state.totalRevenue / 3);
+        const text = `Я, ______, обещаю начать монетизировать базу с Card.Club.\nМоя цель — $${monthly}/мес.\nДата: ${dateStr}\n\n💪 Я получил инструменты, материалы и поддержку. Пора действовать!`;
+        el.innerHTML = text.replace(/\n/g, '<br>') + 
+            `<button class="copy-btn" onclick="copyPromise()">📋</button>`;
+        // store in localStorage
+        try {
+            localStorage.setItem('cardclub_promise', JSON.stringify({ text, date: Date.now() }));
+        } catch(e) {}
+    }
+
+    function copyPromise() {
+        const el = document.getElementById('promiseText');
+        const text = el?.textContent?.replace('📋', '')?.trim() || 'Моё обещание Card.Club';
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Скопировано! Отправьте себе в Telegram или на почту.');
+        }).catch(() => {
+            prompt('Скопируйте вручную:', text);
+        });
+    }
+
+    // ===== LOAD FROM localStorage =====
+    (function init() {
+        try {
+            const saved = localStorage.getItem('cardclub_promise');
+            if (saved) {
+                // Optionally show return notification
+                setTimeout(() => {
+                    // subtle notification
+                }, 1000);
+            }
+        } catch(e) {}
+        updateUI();
+    })();
+
+    // ===== EXTRA: simulate initial feed =====
+    addFeed('🚀 Добро пожаловать в партнёрскую программу');
+</script>
+</body>
+</html>
