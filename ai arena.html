@@ -1,0 +1,729 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card.Club Partner Journey | Virtual Test Drive</title>
+    <style>
+        /* 
+         * 🎨 CORE AESTHETICS: Dark Premium B2B FinTech 
+         * Font: Inter (System UI) + JetBrains Mono for Data
+         */
+        :root {
+            --bg-dark: #05070a;
+            --bg-panel: rgba(20, 25, 35, 0.6);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            
+            --primary-accent: #6366f1; /* Indigo glow */
+            --secondary-accent: #8b5cf6; /* Violet glow */
+            --gold-accent: #fbbf24;
+            --success: #10b981;
+            
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+        }
+
+        /* 📱 MAIN CONTAINER */
+        #app-container {
+            width: 100%;
+            max-width: 580px;
+            min-height: 100vh;
+            position: relative;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media(min-width: 600px) {
+            #app-container {
+                min-height: auto;
+                height: 90vh;
+                border-radius: 32px;
+                border: 1px solid var(--glass-border);
+                background: rgba(5, 7, 10, 0.8);
+                backdrop-filter: blur(20px);
+                box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
+                padding: 40px;
+            }
+        }
+
+        /* 🧩 COMPONENTS */
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Glass Shine Effect */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
+        h1 { font-size: 28px; background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; }
+
+        .highlight { color: var(--primary-accent); font-weight: 600; }
+        .gold-text { color: var(--gold-accent); font-weight: 600; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            border: none;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            margin-top: 12px;
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: var(--text-muted); }
+
+        .btn-glow { animation: pulse 2s infinite; }
+
+        /* INPUTS & SLIDERS */
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            appearance: none;
+            margin: 20px 0;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
+
+        .input-group { margin-bottom: 24px; text-align: left; }
+        .input-label { display: block; color: var(--text-muted); font-size: 13px; margin-bottom: 8px; font-family: var(--font-mono); }
+        
+        /* PROGRESS BAR */
+        .progress-track {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.1);
+        }
+        .progress-fill {
+            height: 100%; background: var(--primary-accent); width: 0%; transition: width 0.6s ease;
+        }
+
+        /* HUD (Heads Up Display) */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 24px;
+        }
+        .hud-item { display: flex; flex-direction: column; align-items: center; }
+        .hud-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .hud-value { font-family: var(--font-mono); font-weight: 700; font-size: 16px; color: white; }
+        
+        /* ANIMATIONS */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
+        
+        .screen { display: none; animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .screen.active { display: block; }
+
+        /* GRAPHIC ELEMENTS */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); }
+        .stat-val { font-size: 20px; font-weight: 700; color: var(--primary-accent); }
+        .stat-sub { font-size: 12px; color: var(--text-muted); }
+
+        .achive-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(16, 185, 129, 0.1); color: #34d399;
+            padding: 8px 16px; border-radius: 50px; border: 1px solid rgba(16, 185, 129, 0.3);
+            margin: 10px 0; font-size: 14px; font-weight: 600;
+        }
+
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        .comparison-table th { text-align: left; color: var(--text-muted); padding: 8px; border-bottom: 1px solid var(--glass-border); }
+        .comparison-table td { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .check-icon { color: var(--success); }
+        .cross-icon { color: #ef4444; }
+
+        /* NOTIFICATION TOAST */
+        #toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 24px; border-radius: 50px;
+            color: white; font-size: 14px; font-weight: 600;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            display: flex; align-items: center; gap: 8px;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* SVG ICONS */
+        svg { width: 24px; height: 24px; stroke-width: 2; }
+
+        /* LIVE CHART PLACEHOLDER */
+        .chart-container { height: 150px; width: 100%; position: relative; margin-top: 20px; overflow: hidden; }
+        .chart-line {
+            fill: none; stroke: var(--primary-accent); stroke-width: 3;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+        }
+        .chart-area {
+            fill: url(#gradientArea); opacity: 0.3;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+        }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <!-- Progress Bar -->
+    <div class="progress-track"><div class="progress-fill" id="global-progress"></div></div>
+
+    <!-- SCREEN 1: WELCOME -->
+    <div id="screen-1" class="screen active">
+        <div class="card" style="height: 100%; display:flex; flex-direction:column; justify-content:center;">
+            <div style="margin-bottom: 24px; opacity: 0.9;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-accent)" style="width: 48px; height: 48px;"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" /></svg>
+            </div>
+            <h1>Монетизация вашей базы</h1>
+            <p>У вас есть актив — база клиентов. Сейчас она просто ждет. Давайте превратим её в источник пассивного дохода.</p>
+            <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; border-left: 3px solid var(--primary-accent); margin-bottom: 32px; text-align:left;">
+                <strong style="color:white; display:block; margin-bottom:4px;">💡 Суть Card.Club:</strong>
+                Мы даем вам инструмент (карты USD/EUR), чтобы помочь клиентам оплачивать сервисы за рубежом. Вы зарабатываете 50% от стоимости выпуска.
+            </div>
+            
+            <button class="btn btn-primary btn-glow" onclick="router.go(2)">
+                Рассчитать мой сценарий →
+            </button>
+            <div style="margin-top: 16px; text-align: center; font-size: 12px; color: var(--text-muted);">⏳ Пройдет всего 3 минуты</div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: PERSONALIZATION -->
+    <div id="screen-2" class="screen">
+        <h2>Давайте знакомиться</h2>
+        <p>Цифры будут рассчитаны лично под ваш масштаб бизнеса.</p>
+        
+        <div class="input-group">
+            <label class="input-label">ВАШ СЕГМЕНТ БИЗНЕСА</label>
+            <select id="segment-select" onchange="app.updateSegment()" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:white; border-radius:8px;">
+                <option value="agency">Турагентство / Визовый центр</option>
+                <option value="crypto">Крипто-обменник</option>
+                <option value="realty">Недвижимость за рубежом</option>
+                <option value="bloger">Блогер / Личный бренд</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">РАСКРОЙТЕ БАЗУ КЛИЕНТОВ</label>
+            <span id="db-count-display" class="stat-val" style="display:block; margin-bottom:12px;">500</span>
+            <input type="range" id="db-slider" min="100" max="50000" step="50" value="500" oninput="app.updateDB(this.value)">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+                <span>50</span><span>50k+</span>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="app.startSimulation()">Продолжить расчет</button>
+    </div>
+
+    <!-- SCREEN 3: ACTIVATION & SELF TEST -->
+    <div id="screen-3" class="screen">
+        <div style="position:absolute; top:24px; right:24px;">
+             <span class="gold-text">XP: <span id="xp-display-3">0</span></span>
+        </div>
+        
+        <h2>Кабинет активирован</h2>
+        <p>Перед тем как продать карту клиенту, попробуйте продукт сами. Доверие начинается с личного опыта.</p>
+
+        <div class="stat-grid">
+            <div class="stat-card" onclick="app.selectSelfTest('ai')" id="btn-self-ai" style="cursor:pointer; border-color:transparent;">
+                <div style="font-size:24px; margin-bottom:8px;">🤖</div>
+                <div class="stat-sub">Оплатить ИИ / Медиа</div>
+                <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Netflix, ChatGPT Plus...</div>
+            </div>
+            <div class="stat-card" onclick="app.selectSelfTest('biz')" id="btn-self-biz" style="cursor:pointer; border-color:transparent;">
+                <div style="font-size:24px; margin-bottom:8px;">💼</div>
+                <div class="stat-sub">Бизнес-инфраструктура</div>
+                <div style="font-size:12px; color:#94a3b8; margin-top:4px;">AWS, Google Cloud, Soft...</div>
+            </div>
+        </div>
+
+        <div id="self-test-success" class="hidden">
+            <div class="achive-badge">✅ Ачивка: Самотестер (+100 XP)</div>
+            <p style="font-size:13px; margin-top:8px;">Теперь вы точно знаете преимущества перед конкурентами.</p>
+        </div>
+
+        <button id="btn-proceed-3" class="btn btn-primary hidden" onclick="router.go(4)">Перейти к стратегии</button>
+    </div>
+
+    <!-- SCREEN 4: PRICING & STRATEGY -->
+    <div id="screen-4" class="screen">
+        <h2>Стратегия монетизации</h2>
+        <p>На какой сегмент ориентированы ваши клиенты? Ценовой вопрос критичен.</p>
+
+        <div class="input-group">
+            <label class="input-label">РЕКОМЕНДУЕМАЯ ЦЕНА ВЫПУСКА КАРТЫ</label>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                 <span class="stat-val" id="price-val">$35</span>
+            </div>
+            <input type="range" id="price-slider" min="20" max="200" step="5" value="35" oninput="app.updatePrice(this.value)">
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Характеристика</th>
+                    <th>Ваши Клиенты (РФ)</th>
+                    <th>Конкуренты (КЗ/КГ)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Средняя цена</td>
+                    <td class="highlight">$<span id="comp-price">35</span></td>
+                    <td>$250–300</td>
+                </tr>
+                <tr>
+                    <td>Время выдачи</td>
+                    <td class="highlight">2 минуты</td>
+                    <td>10–30 дней</td>
+                </tr>
+                <tr>
+                    <td>Бюрократия</td>
+                    <td class="check-icon">Онлайн</td>
+                    <td class="cross-icon">Требуется виза/выезд</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="btn btn-primary" onclick="router.go(5)">Выбрать эту стратегию</button>
+    </div>
+
+    <!-- SCREEN 5: GROWTH LOOP -->
+    <div id="screen-5" class="screen">
+        <div class="hud">
+            <div class="hud-item">
+                <span class="hud-label">Текущий ранг</span>
+                <span class="hud-value gold-text" id="rank-display">STARTER</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Доход (90 дней)</span>
+                <span class="hud-value" style="color:#34d399;">$<span id="live-income">0</span></span>
+            </div>
+        </div>
+
+        <h3>Этап запуска</h3>
+        
+        <!-- Phase 1: Materials -->
+        <div id="phase-materials" class="card" style="text-align:left; padding:20px;">
+            <h4 style="margin-bottom:12px; color:white;">1️⃣ Подготовительная фаза</h4>
+            <p style="margin-bottom:16px; font-size:14px;">Клиенты хотят понимать ценность. Вам нужны готовые инфоповоды и скрипты.</p>
+            <button class="btn btn-outline" style="width:auto; padding:10px 20px;" onclick="app.getBumpMaterials()">📥 Забрать СММ-кит</button>
+        </div>
+
+        <!-- Phase 2: Action Loop -->
+        <div id="phase-action" class="hidden">
+            <div class="achive-badge">🚀 Ачивка: Готово к продажам</div>
+            
+            <div class="input-group" style="margin-top:24px;">
+                <label class="input-label">ДЕЙСТВИЕ</label>
+                <div class="card" style="padding:16px; margin-bottom:16px; text-align:left;">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                        <div style="width:40px; height:40px; background:rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center;">📨</div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px; color:white;">Разослать предложение базе</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Охват: <span id="action-coverage">500</span> контактов</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="padding:10px;" onclick="app.makeAction()">Сделать касание</button>
+                </div>
+                
+                <div class="chart-container">
+                    <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="gradientArea" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#6366f1"/>
+                                <stop offset="100%" stop-color="transparent"/>
+                            </linearGradient>
+                        </defs>
+                        <path id="graph-path" class="chart-area" d="M0 50 L0 50 L0 50 Z" />
+                        <path id="graph-line" class="chart-line" d="M0 50 C 30 50, 40 50, 100 50" />
+                    </svg>
+                </div>
+                <div style="text-align:center; margin-top:10px; font-size:12px; color:var(--text-muted);">Динамика роста выручки</div>
+            </div>
+        </div>
+
+        <button id="btn-next-end" class="btn btn-primary hidden" onclick="router.go(6)">Смотреть прогноз года →</button>
+    </div>
+
+    <!-- SCREEN 6: KILLER FINALE -->
+    <div id="screen-6" class="screen">
+        <h1>Reality Break 🛑</h1>
+        <p>Если ничего не делать — ваша база останется лишь цифрой в CRM.</p>
+        
+        <div class="stat-grid" style="grid-template-columns: 1fr;">
+             <div class="stat-card" style="border-left: 4px solid var(--text-muted);">
+                <div class="stat-sub">Сценарий "Тишина"</div>
+                <div class="stat-val" style="color: var(--text-muted);">$0.00</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">База теряет актуальность</div>
+            </div>
+             <div class="stat-card" style="border-left: 4px solid var(--primary-accent);">
+                <div class="stat-sub">Сценарий Card.Club (За год)</div>
+                <div class="stat-val" style="color: var(--gold-accent);">~$<span id="final-annual">18,000</span></div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">Это VIP-зал аэропортов + 3 месяца отдыха</div>
+            </div>
+        </div>
+
+        <div class="card" style="background: rgba(99, 102, 241, 0.1); border-color: var(--primary-accent);">
+            <h3 style="margin-top:0;">✉️ Моё обещание себе</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+                Я начинаю действовать сейчас. Через 2 месяца я оглянусь назад и буду благодарен за этот старт.
+            </p>
+            
+            <textarea id="future-letter" readonly style="width:100%; height:100px; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); color:white; padding:12px; border-radius:8px; font-size:13px; margin-bottom:16px;"></textarea>
+            
+            <div style="display:flex; gap:12px;">
+                <button class="btn btn-outline" style="flex:1; padding:10px;" onclick="app.copyLetter()">📋 Копировать</button>
+                <button class="btn btn-primary" style="flex:1; padding:10px;" onclick="app.openFutureMail()">📬 Отправить мне</button>
+            </div>
+            
+            <div style="font-size:11px; color:var(--text-muted); margin-top:8px; text-align:center;">
+                Письмо будет отправлено с датой [Date + 2 months].
+            </div>
+        </div>
+
+        <div style="margin-top: 32px;">
+            <h3 style="font-size:16px; margin-bottom:12px;">Начнем реализацию?</h3>
+            <a href="#" id="cta-tg-link" target="_blank" class="btn btn-primary">
+                Написать Владимиру (@Vladi_andr)
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">
+        <span style="color:#34d399;">✓</span> <span id="toast-msg">Успешно!</span>
+    </div>
+
+</div>
+
+<script>
+/**
+ * CARD.CLUB PARTNER JOURNEY v5
+ * Core Logic & Architecture
+ */
+
+const app = {
+    state: {
+        segment: 'agency',
+        baseSize: 500,
+        cardPrice: 35, // User's revenue is 50% of price -> $17.5
+        steps: 0,
+        income: 0,
+        rank: 'STARTER',
+        materialsUnlocked: false,
+        selfTestDone: false
+    },
+    
+    constants: {
+        conversionRate: 0.01, // 1% response rate
+        boostMultiplier: 1.25, // 25% bonus after getting materials
+        pricePerCard: 35, // Base for calculation logic
+    },
+
+    init() {
+        this.renderFutureLetter();
+        this.updatePriceDisplay();
+        this.loadStateFromStorage();
+    },
+
+    updateSegment() {
+        const s = document.getElementById('segment-select').value;
+        this.state.segment = s;
+        // Barnum effect simulation
+        if(s === 'agency') this.showToast("Подходит идеально для туризма");
+        if(s === 'realty') this.showToast("Высокий чек недвижимости");
+    },
+
+    updateDB(val) {
+        this.state.baseSize = parseInt(val);
+        document.getElementById('db-count-display').innerText = val;
+        // Update action coverage preview
+        document.getElementById('action-coverage').innerText = val;
+    },
+
+    updatePrice(val) {
+        this.state.cardPrice = parseInt(val);
+        document.getElementById('price-val').innerText = `$${val}`;
+        this.updatePriceDisplay();
+    },
+
+    updatePriceDisplay() {
+        // Comparison table update
+        document.getElementById('comp-price').innerText = this.state.cardPrice;
+    },
+
+    startSimulation() {
+        router.go(3);
+    },
+
+    // --- Step 3 Logic: Self Test ---
+    selectSelfTest(type) {
+        if (this.state.selfTestDone) return;
+        
+        // Visual feedback
+        const el = type === 'ai' ? document.getElementById('btn-self-ai') : document.getElementById('btn-self-biz');
+        el.style.borderColor = 'var(--primary-accent)';
+        el.style.background = 'rgba(99, 102, 241, 0.1)';
+        
+        setTimeout(() => {
+            this.state.selfTestDone = true;
+            document.getElementById('self-test-success').classList.remove('hidden');
+            document.getElementById('btn-proceed-3').classList.remove('hidden');
+            this.showToast("Карта выпущена! Вы успешно прошли тест.");
+        }, 600);
+    },
+
+    // --- Step 5 Logic: Growth Loop ---
+    getBumpMaterials() {
+        if(this.state.materialsUnlocked) return;
+        
+        const btn = document.querySelector('#phase-materials button');
+        btn.innerHTML = "⏳ Загрузка материалов...";
+        btn.disabled = true;
+
+        setTimeout(() => {
+            this.state.materialsUnlocked = true;
+            document.getElementById('phase-materials').classList.add('hidden');
+            document.getElementById('phase-action').classList.remove('hidden');
+            
+            this.showToast("Кит получен! Конверсия выросла на 25%.");
+            this.animateGraph(); // First small bump
+        }, 1500);
+    },
+
+    makeAction() {
+        // Calculate revenue spike
+        // Formula: Base * Conversion * Boost
+        const rawReplies = Math.floor(this.state.baseSize * this.constants.conversionRate);
+        const multiplier = this.state.materialsUnlocked ? this.constants.boostMultiplier : 1;
+        
+        // Add variance
+        const realConversions = Math.floor(rawReplies * multiplier * (0.8 + Math.random() * 0.4));
+        
+        const revenueStep = realConversions * (this.state.cardPrice * 0.5); // 50% margin
+        
+        // Animate Income
+        const currentIncomeEl = document.getElementById('live-income');
+        const finalIncome = this.state.income + revenueStep;
+        
+        let tempIncome = this.state.income;
+        const interval = setInterval(() => {
+            tempIncome += Math.ceil(revenueStep / 20);
+            if(tempIncome >= finalIncome) tempIncome = finalIncome;
+            currentIncomeEl.innerText = tempIncome.toLocaleString();
+            
+            if(tempIncome === finalIncome) clearInterval(interval);
+        }, 50);
+        
+        this.state.income = finalIncome;
+        this.checkRankUpgrade();
+        
+        // Disable button and show Next Step button after delay
+        const btn = document.querySelector('#phase-action button');
+        btn.disabled = true;
+        btn.style.background = "#475569";
+        btn.innerText = "Данные обновляются...";
+        
+        setTimeout(() => {
+            document.getElementById('btn-next-end').classList.remove('hidden');
+        }, 1000);
+    },
+
+    checkRankUpgrade() {
+        // Simple Rank Logic based on Income
+        let newRank = this.state.rank;
+        if(this.state.income > 1000) newRank = "PRO";
+        if(this.state.income > 5000) newRank = "EXPERT";
+        if(this.state.income > 15000) newRank = "ELITE";
+        
+        if(newRank !== this.state.rank) {
+            this.state.rank = newRank;
+            document.getElementById('rank-display').innerText = newRank;
+            document.getElementById('rank-display').style.color = "#fbbf24";
+            setTimeout(() => {
+                document.getElementById('rank-display').style.color = "#ffd700";
+            }, 1000);
+            this.showToast(`🏆 Ранг повышен: ${newRank}!`);
+        }
+    },
+
+    animateGraph() {
+        // Simple SVG path drawing simulation
+        const path = document.getElementById('graph-path');
+        const line = document.getElementById('graph-line');
+        
+        // Reset
+        line.setAttribute('d', 'M0 50 C 30 50, 40 50, 100 50');
+        
+        // Animate (Simulate growth curve)
+        // M0 50 Q 50 50, 100 10
+        setTimeout(() => {
+            line.setAttribute('d', 'M0 50 C 30 50, 60 30, 100 10');
+        }, 100);
+    },
+
+    // --- Screen 6: Future Letter ---
+    renderFutureLetter() {
+        const dateObj = new Date();
+        dateObj.setMonth(dateObj.getMonth() + 2);
+        const dateStr = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+        
+        const template = `Привет! Сегодня ты открыл это письмо, прошед 2 месяца.
+        
+Я надеюсь, что ты вспомнил о нашем разговоре о базе клиентов. 
+Смотри, сколько возможностей упустил бы ты без Card.Club. 
+
+Помнишь тот первый шаг? Теперь ты получаешь доход на каждую транзакцию партнера.
+Твои клиенты довольны оплатой из-за границы. Ты выглядишь экспертом.
+Спасибо, что не бросил всё на середине пути.
+
+С уважением к твоему будущему успеху.
+Твой партнёр Card.Club.`;
+        
+        document.getElementById('future-letter').value = template;
+    },
+
+    copyLetter() {
+        const text = document.getElementById('future-letter').value;
+        navigator.clipboard.writeText(text).then(() => {
+            this.showToast("Текст скопирован! Отправьте себе в Telegram Saved Messages.");
+        });
+    },
+
+    openFutureMail() {
+        // Create a mailto link that contains the text. 
+        // Note: Real email clients handle attachments/body differently, but this is best effort without backend.
+        const subject = encodeURIComponent("Моё обещание себе (открыть через 2 мес)");
+        const body = encodeURIComponent(document.getElementById('future-letter').value);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    },
+
+    showToast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    },
+
+    saveStateToStorage() {
+        localStorage.setItem('cc_journey_v5_state', JSON.stringify({
+            completed: true,
+            income: this.state.income,
+            rank: this.state.rank,
+            lastVisit: Date.now()
+        }));
+    },
+
+    loadStateFromStorage() {
+        // Placeholder for logic to resume if needed
+        // For now, we just ensure clean state or pre-fill if returning user
+    }
+};
+
+// Simple Router
+const router = {
+    current: 1,
+    go(screenId) {
+        // Save progress before leaving screen 5 (final calc)
+        if(screenId === 6) app.saveStateToStorage();
+        
+        // Update Progress Bar
+        const pct = ((screenId - 1) / 5) * 100;
+        document.getElementById('global-progress').style.width = `${pct}%`;
+
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(`screen-${screenId}`).classList.add('active');
+        this.current = screenId;
+    }
+};
+
+// Init App
+window.addEventListener('DOMContentLoaded', () => {
+    app.init();
+});
+
+</script>
+</body>
+</html>
+```
